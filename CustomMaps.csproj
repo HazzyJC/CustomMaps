@@ -35,6 +35,10 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\Hazzy The Editor\New folder\steamapps\common\Hard Bullet\Hard Bullet_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="FMODUnity, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Hazzy The Editor\New folder\steamapps\common\Hard Bullet\Hard Bullet_Data\Managed\FMODUnity.dll</HintPath>
+    </Reference>
     <Reference Include="HBMF">
       <HintPath>..\..\..\Hazzy The Editor\New folder\steamapps\common\Hard Bullet\Mods\HBMF.dll</HintPath>
     </Reference>
@@ -62,6 +66,10 @@
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
       <HintPath>..\..\..\Hazzy The Editor\New folder\steamapps\common\Hard Bullet\Hard Bullet_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Hazzy The Editor\New folder\steamapps\common\Hard Bullet\Hard Bullet_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\Hazzy The Editor\New folder\steamapps\common\Hard Bullet\Hard Bullet_Data\Managed\UnityEngine.CoreModule.dll</HintPath>

@@ -15,6 +15,8 @@ using HBMF;
 using BulletMenuVR;
 using System.Reflection;
 using UnityEngine.AI;
+using FMODUnity;
+using FMOD;
 
 namespace CustomMaps
 {
@@ -27,9 +29,11 @@ namespace CustomMaps
         public bool isCustomMapsActive = false;
         public override void OnApplicationStart()
         {
-            //-- Shows Directory
+            //-- Create Directory
             Directory.CreateDirectory(MelonUtils.UserDataDirectory + "\\CustomMaps");
             Directory.CreateDirectory(MelonUtils.UserDataDirectory + "\\ModManager");
+            
+            // Menu
             string[] dirs3 = Directory.GetFiles(String.Format("{0}\\CustomMaps", MelonUtils.UserDataDirectory), "*.hbm");
 
             string[] dirs2 = Directory.GetDirectories(MelonUtils.UserDataDirectory + "\\ModManager");
@@ -63,7 +67,7 @@ namespace CustomMaps
                 }));
                 i++;
             }
-
+            
             VrMenuPageBuilder wavePageBuilder = VrMenuPageBuilder.Builder();
 
             wavePageBuilder.AddButton(new VrMenuButton("Spawn Waves", () =>
@@ -126,7 +130,8 @@ namespace CustomMaps
                 CreateMap.SpawnMap(whichMapLoading);
             }
         }
-
+        
+        // Destroys and moves the playground gameobjects
         public static void Catcher()
         {
             CustomMapsClass cmp = new CustomMapsClass();
@@ -142,7 +147,11 @@ namespace CustomMaps
             Map.SetActive(false);
             Map2.SetActive(false);
             Map3.SetActive(false);
+            GameObject scene = GameObject.Find("[SCENE]");
+            scene.transform.position = new Vector3(0, 1000, 0);
         }
+        
+        // Debugging
         public override void OnUpdate()
         {
             if (Input.GetKeyDown(KeyCode.M))
@@ -151,7 +160,8 @@ namespace CustomMaps
             }
         }
     }
-
+    
+    // Loading the map Assetbundles
     public class CreateMap : MonoBehaviour
     {
         public static AssetBundle LastLoad;
@@ -172,6 +182,8 @@ namespace CustomMaps
         public static AssetBundle localAssetBundle;
         public static void SpawnMap(int mapNum)
         {
+            // Destroys the last map loaded (May be unnecessary idc)
+            
             playerOne = GameObject.Find("[HARD BULLET PLAYER]");
             if (lastMap != null)
             {
@@ -182,7 +194,8 @@ namespace CustomMaps
                 NavMesh.RemoveNavMeshData(lastNavMesh);
             }
 
-
+            // Puts every map found in the user's UserData/CustomMap folder
+            
             string[] dirs3 = Directory.GetFiles(String.Format("{0}\\CustomMaps", MelonUtils.UserDataDirectory), "*.hbm");
 
             string[] dirs2 = Directory.GetDirectories(MelonUtils.UserDataDirectory + "\\ModManager");
@@ -202,6 +215,8 @@ namespace CustomMaps
             
             string[] dirs = ls.ToArray();
             string mapName = dirs[mapNum];
+            
+            // Destoys Hard Bullet's scene restart thing when a player goes out of bounds
             Destroy(GameObject.Find("[HARD BULLET PLAYER]/PlayerSystems/OutOfBoundsSceneRestart"));
 
             //Spawns The Map
@@ -214,7 +229,8 @@ namespace CustomMaps
                 MelonLogger.Msg("Failed :((((((");
                 return;
             }
-
+            
+            // Loading and using a NavMesh, thx swipez for helping with this
             GameObject asset = localAssetBundle.LoadAsset<GameObject>("CustomMap");
             NavMeshData navMesh = localAssetBundle.LoadAsset<NavMeshData>("NavMesh");
             if (navMesh != null)
@@ -225,11 +241,6 @@ namespace CustomMaps
             }
             lastMap = Instantiate(asset);
             localAssetBundle.Unload(false);
-
-            //tp scene
-            GameObject scene = GameObject.Find("[SCENE]");
-            scene.transform.position = new Vector3(0, 500, 0);
-            GameObject.Destroy(GameObject.Find("[SCENE]/Environment/StaticGeometry/"));
 
             //View Distance;
             Camera cam = GameObject.Find("[HARD BULLET PLAYER]/HexaBody/Pelvis/CameraRig/FloorOffset/Scaler/Camera").GetComponent<Camera>();
@@ -242,6 +253,7 @@ namespace CustomMaps
             {
                 MelonLogger.Warning("cam is null lmfao cryingemoji x 7");
             }
+            // Spawning the player at the spawnpoint gameobject in custom map
             else
             {
                 GameObject spawnPoint = GameObject.Find("CustomMap(Clone)/spawnpoint");
@@ -254,7 +266,8 @@ namespace CustomMaps
                     playerOne.transform.position = spawnPoint.transform.position;
                 }
             }
-
+            
+            //Swipez's enemy prefab stuff. Once again, thx swipez for helping with this
             GameObject enemyPrefab = null;
 
             foreach (EnemySpawnerFromGenerator checkedSpawner in Resources.FindObjectsOfTypeAll<EnemySpawnerFromGenerator>())
@@ -273,18 +286,26 @@ namespace CustomMaps
 
             if (enemyPrefab == null)
             {
-                MelonLogger.Msg("fartballs");
+                MelonLogger.Msg("EnemyPrefab is null? huh?");
             }
-
-            //spawnpoints
-            GameObject.Find("SpawnPoint").transform.position = GameObject.Find("sp1").transform.position;
-            GameObject.Find("SpawnPoint (1)").transform.position = GameObject.Find("sp2").transform.position;
-            GameObject.Find("SpawnPoint (2)").transform.position = GameObject.Find("sp3").transform.position;
-            GameObject.Find("SpawnPoint (3)").transform.position = GameObject.Find("sp4").transform.position;
-            GameObject.Find("SpawnPoint (4)").transform.position = GameObject.Find("sp5").transform.position;
-            GameObject.Find("SpawnPoint (5)").transform.position = GameObject.Find("sp6").transform.position;
-
-
+            
+            // Enemy Spawnpoints
+            var firstSpawn = GameObject.Find("sp1");
+            if (firstSpawn != null)
+            {
+                GameObject.Find("SpawnPoint").transform.position = GameObject.Find("sp1").transform.position;
+                GameObject.Find("SpawnPoint (1)").transform.position = GameObject.Find("sp2").transform.position;
+                GameObject.Find("SpawnPoint (2)").transform.position = GameObject.Find("sp3").transform.position;
+                GameObject.Find("SpawnPoint (3)").transform.position = GameObject.Find("sp4").transform.position;
+                GameObject.Find("SpawnPoint (4)").transform.position = GameObject.Find("sp5").transform.position;
+                GameObject.Find("SpawnPoint (5)").transform.position = GameObject.Find("sp6").transform.position;
+            }
+            
+            // FMOD testing (fuck fmod btw)
+            GameObject.Find("CustomMap(Clone)").AddComponent<FMODAudioSource>();
+            
+            // Calm enemy spawning, I hope people use this
+            // I should really stop naming my variables stuff like this
             GameObject[] balls = GameObject.FindObjectsOfType<GameObject>();
             foreach (GameObject cum in balls)
             {
